@@ -3,24 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Obearco - Login</title>
+    <title>Obearco</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <div class="card">
-            <h1>⚙️ Retorne a Obearco</h1>
-
-            <div class="status">
-                <span id="status-indicator" class="offline"></span>
-                <span id="status-text">Servidor Offline</span>
-            </div>
-
-            <div class="buttons">
-                <button id="loginButton">Login</button>
-                <button id="registerButton">Registro</button>
-            </div>
+        <h1>⚙️ Retorne a Obearco</h1>
+        <div class="status">
+            <span id="status-indicator" class="offline"></span>
+            <span id="status-text">Carregando status...</span>
         </div>
+        <div class="version" id="version"></div>
+
+        <textarea id="jsonInput" placeholder='Digite seu JSON aqui...'></textarea>
+        <button id="sendButton">Enviar</button>
+
+        <div id="responseBox"></div>
     </div>
 
     <script src="scripts.js"></script>

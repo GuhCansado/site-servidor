@@ -1,40 +1,64 @@
-document.addEventListener("DOMContentLoaded", () => {
-    const loginButton = document.getElementById("loginButton");
-    const registerButton = document.getElementById("registerButton");
+document.addEventListener("DOMContentLoaded", async () => {
     const statusIndicator = document.getElementById("status-indicator");
     const statusText = document.getElementById("status-text");
+    const versionBox = document.getElementById("version");
+    const sendButton = document.getElementById("sendButton");
+    const jsonInput = document.getElementById("jsonInput");
+    const responseBox = document.getElementById("responseBox");
 
-    // 🔗 Troque pelo link do seu servidor Ngrok ou localhost
-    const SERVER_URL = "https://seu-endereco-ngrok.ngrok.io";
+    let serverData = null;
 
-    // Verifica status do servidor
-    async function checkServerStatus() {
+    // 📦 Carrega as informações do servidor
+    async function loadServerInfo() {
         try {
-            const response = await fetch(SERVER_URL + "/status");
-            if (response.ok) {
-                statusIndicator.classList.remove("offline");
+            const res = await fetch("server_info.json");
+            serverData = await res.json();
+
+            versionBox.textContent = `Versão: ${serverData.version || "Desconhecida"}`;
+
+            if (serverData.status.toLowerCase() === "online") {
                 statusIndicator.classList.add("online");
-                statusText.textContent = "Servidor Online";
+                statusText.textContent = "🟢 Servidor Online";
             } else {
-                throw new Error();
+                statusIndicator.classList.remove("online");
+                statusText.textContent = "🔴 Servidor Offline";
             }
-        } catch {
-            statusIndicator.classList.remove("online");
-            statusIndicator.classList.add("offline");
-            statusText.textContent = "Servidor Offline";
+        } catch (err) {
+            statusText.textContent = "Erro ao carregar informações do servidor.";
         }
     }
 
-    // Verifica a cada 10 segundos
-    checkServerStatus();
-    setInterval(checkServerStatus, 10000);
+    // 🚀 Envia o JSON digitado para o servidor
+    async function sendJson() {
+        if (!serverData || !serverData.url) {
+            responseBox.textContent = "Erro: servidor não configurado.";
+            return;
+        }
 
-    // Ações dos botões
-    loginButton.addEventListener("click", () => {
-        window.location.href = "login.html";
-    });
+        let userJson;
+        try {
+            userJson = JSON.parse(jsonInput.value);
+        } catch {
+            responseBox.textContent = "Erro: JSON inválido.";
+            return;
+        }
 
-    registerButton.addEventListener("click", () => {
-        window.location.href = "registro.html";
-    });
+        try {
+            const res = await fetch(`${serverData.url}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(userJson)
+            });
+
+            const data = await res.text();
+            responseBox.textContent = "Resposta do servidor:\n" + data;
+            jsonInput.value = "";
+        } catch (err) {
+            responseBox.textContent = "Erro ao conectar ao servidor.";
+        }
+    }
+
+    sendButton.addEventListener("click", sendJson);
+
+    await loadServerInfo();
 });

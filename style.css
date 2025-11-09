@@ -1,62 +1,36 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
 body {
-    margin: 0;
-    height: 100vh;
-    font-family: 'Poppins', sans-serif;
     background: radial-gradient(circle at top left, #101020, #070710);
-    color: white;
+    color: #fff;
+    font-family: 'Poppins', sans-serif;
+    height: 100vh;
+    margin: 0;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
 .container {
-    text-align: center;
-}
-
-.card {
     background: rgba(255, 255, 255, 0.05);
     padding: 40px;
-    border-radius: 20px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(10px);
-    transition: all 0.3s;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+    box-shadow: 0 0 20px rgba(0,0,0,0.6);
 }
 
 h1 {
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     font-size: 24px;
-    color: #fff;
-}
-
-.buttons {
-    margin-top: 20px;
-}
-
-button {
-    background-color: #4444dd;
-    color: white;
-    border: none;
-    padding: 12px 25px;
-    margin: 8px;
-    border-radius: 10px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-button:hover {
-    background-color: #6666ff;
 }
 
 .status {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 15px;
-    font-size: 14px;
-    color: #ccc;
+    margin-bottom: 8px;
 }
 
 #status-indicator {
@@ -64,13 +38,52 @@ button:hover {
     height: 10px;
     border-radius: 50%;
     margin-right: 8px;
-    background-color: red;
+    background-color: #ff4444;
 }
 
 #status-indicator.online {
     background-color: #00ff55;
 }
 
-#status-indicator.offline {
-    background-color: #ff4444;
+.version {
+    font-size: 14px;
+    color: #aaa;
+    margin-bottom: 20px;
+}
+
+textarea {
+    width: 100%;
+    height: 120px;
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 10px;
+    resize: none;
+    outline: none;
+    font-family: monospace;
+}
+
+button {
+    margin-top: 15px;
+    padding: 10px 25px;
+    border: none;
+    background-color: #4444dd;
+    color: #fff;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    background-color: #6666ff;
+}
+
+#responseBox {
+    margin-top: 20px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 10px;
+    white-space: pre-wrap;
+    font-size: 14px;
 }
