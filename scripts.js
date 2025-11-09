@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", async () => {
+window.addEventListener("load", async () => {
     const statusIndicator = document.getElementById("status-indicator");
     const statusText = document.getElementById("status-text");
     const versionBox = document.getElementById("version");
@@ -6,17 +6,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     const jsonInput = document.getElementById("jsonInput");
     const responseBox = document.getElementById("responseBox");
 
+    if (!statusIndicator || !statusText || !sendButton) {
+        console.error("❌ Elementos não encontrados no DOM. Verifique os IDs no HTML.");
+        return;
+    }
+
     let serverData = null;
 
-    // 📦 Carrega as informações do servidor
+    // 📦 Função para carregar as informações do servidor
     async function loadServerInfo() {
         try {
-            const res = await fetch("server_info.json");
+            const res = await fetch("server_info.json?cache=" + Date.now());
+            if (!res.ok) throw new Error("Arquivo server_info.json não encontrado.");
             serverData = await res.json();
 
             versionBox.textContent = `Versão: ${serverData.version || "Desconhecida"}`;
 
-            if (serverData.status.toLowerCase() === "online") {
+            if (serverData.status && serverData.status.toLowerCase() === "online") {
                 statusIndicator.classList.add("online");
                 statusText.textContent = "🟢 Servidor Online";
             } else {
@@ -24,14 +30,16 @@ document.addEventListener("DOMContentLoaded", async () => {
                 statusText.textContent = "🔴 Servidor Offline";
             }
         } catch (err) {
-            statusText.textContent = "Erro ao carregar informações do servidor.";
+            console.error("Erro ao carregar informações do servidor:", err);
+            statusIndicator.classList.remove("online");
+            statusText.textContent = "🔴 Erro ao carregar status";
         }
     }
 
     // 🚀 Envia o JSON digitado para o servidor
     async function sendJson() {
         if (!serverData || !serverData.url) {
-            responseBox.textContent = "Erro: servidor não configurado.";
+            responseBox.textContent = "⚠️ Servidor não configurado ou offline.";
             return;
         }
 
@@ -39,26 +47,31 @@ document.addEventListener("DOMContentLoaded", async () => {
         try {
             userJson = JSON.parse(jsonInput.value);
         } catch {
-            responseBox.textContent = "Erro: JSON inválido.";
+            responseBox.textContent = "❌ JSON inválido. Corrija o formato antes de enviar.";
             return;
         }
 
+        responseBox.textContent = "⏳ Enviando dados...";
+
         try {
-            const res = await fetch(`${serverData.url}`, {
+            const res = await fetch(serverData.url, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(userJson)
             });
 
-            const data = await res.text();
-            responseBox.textContent = "Resposta do servidor:\n" + data;
+            const text = await res.text();
+            responseBox.textContent = "✅ Resposta do servidor:\n" + text;
             jsonInput.value = "";
         } catch (err) {
-            responseBox.textContent = "Erro ao conectar ao servidor.";
+            console.error("Erro ao enviar JSON:", err);
+            responseBox.textContent = "🔴 Erro ao conectar ao servidor.";
         }
     }
 
     sendButton.addEventListener("click", sendJson);
 
+    // 🔁 Atualiza o status a cada 10 segundos
     await loadServerInfo();
+    setInterval(loadServerInfo, 10000);
 });
