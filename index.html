@@ -3,24 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Retorne a Obearco</title>
+    <title>Obearco - Login</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h1 class="logo">⚙️ Retorne a Obearco</h1>
-        
-        <div class="menu">
-            <button id="loginBtn">Login</button>
-            <button id="registerBtn">Registro</button>
+        <div class="card">
+            <h1>⚙️ Retorne a Obearco</h1>
+
+            <div class="status">
+                <span id="status-indicator" class="offline"></span>
+                <span id="status-text">Servidor Offline</span>
+            </div>
+
+            <div class="buttons">
+                <button id="loginButton">Login</button>
+                <button id="registerButton">Registro</button>
+            </div>
         </div>
-
-        <form id="form" class="hidden">
-            <div id="inputs"></div>
-            <button type="submit" class="submit">Concluir</button>
-        </form>
-
-        <p id="status"></p>
     </div>
 
     <script src="scripts.js"></script>

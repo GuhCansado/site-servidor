@@ -1,87 +1,40 @@
-// URL do JSON hospedado no GitHub Pages
-const STATUS_URL = "https://guhcansado.github.io/site-servidor/server_status.json";
-
-// Função que busca o servidor atual
-async function getServerInfo() {
-    try {
-        const response = await fetch(STATUS_URL + `?t=${Date.now()}`); // evita cache
-        const data = await response.json();
-        console.log("📡 Servidor carregado:", data);
-        return data;
-    } catch (error) {
-        console.error("❌ Erro ao buscar status do servidor:", error);
-        alert("Não foi possível conectar ao servidor. Tente novamente mais tarde.");
-        return null;
-    }
-}
-
-// =============================
-// INTERFACE E BOTÕES
-// =============================
 document.addEventListener("DOMContentLoaded", () => {
-    const container = document.getElementById("container");
-    const loginBtn = document.getElementById("login-btn");
-    const registerBtn = document.getElementById("register-btn");
+    const loginButton = document.getElementById("loginButton");
+    const registerButton = document.getElementById("registerButton");
+    const statusIndicator = document.getElementById("status-indicator");
+    const statusText = document.getElementById("status-text");
 
-    loginBtn.addEventListener("click", () => showForm("login"));
-    registerBtn.addEventListener("click", () => showForm("register"));
+    // 🔗 Troque pelo link do seu servidor Ngrok ou localhost
+    const SERVER_URL = "https://seu-endereco-ngrok.ngrok.io";
+
+    // Verifica status do servidor
+    async function checkServerStatus() {
+        try {
+            const response = await fetch(SERVER_URL + "/status");
+            if (response.ok) {
+                statusIndicator.classList.remove("offline");
+                statusIndicator.classList.add("online");
+                statusText.textContent = "Servidor Online";
+            } else {
+                throw new Error();
+            }
+        } catch {
+            statusIndicator.classList.remove("online");
+            statusIndicator.classList.add("offline");
+            statusText.textContent = "Servidor Offline";
+        }
+    }
+
+    // Verifica a cada 10 segundos
+    checkServerStatus();
+    setInterval(checkServerStatus, 10000);
+
+    // Ações dos botões
+    loginButton.addEventListener("click", () => {
+        window.location.href = "login.html";
+    });
+
+    registerButton.addEventListener("click", () => {
+        window.location.href = "registro.html";
+    });
 });
-
-// Cria o formulário dinamicamente
-function showForm(type) {
-    const container = document.getElementById("container");
-    container.innerHTML = "";
-
-    const form = document.createElement("div");
-    form.classList.add("form");
-
-    let html = "";
-    if (type === "login") {
-        html = `
-            <h2>Login</h2>
-            <input type="email" id="email" placeholder="Email" required><br>
-            <input type="password" id="senha" placeholder="Senha" required><br>
-        `;
-    } else {
-        html = `
-            <h2>Registro</h2>
-            <input type="text" id="nome" placeholder="Nome" required><br>
-            <input type="email" id="email" placeholder="Email" required><br>
-            <input type="password" id="senha" placeholder="Senha" required><br>
-        `;
-    }
-
-    form.innerHTML = html + `<button id="send-btn">Concluir</button>`;
-    container.appendChild(form);
-
-    document.getElementById("send-btn").addEventListener("click", () => sendData(type));
-}
-
-// Envia dados para o servidor Ngrok
-async function sendData(type) {
-    const server = await getServerInfo();
-    if (!server) return;
-
-    const url = `${server.url}/${type}`;
-    const email = document.getElementById("email").value;
-    const senha = document.getElementById("senha").value;
-    const nome = document.getElementById("nome") ? document.getElementById("nome").value : "";
-
-    const payload = type === "login"
-        ? { email, senha }
-        : { email, senha, nome };
-
-    try {
-        const response = await fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-        });
-
-        const data = await response.json();
-        alert(`🔹 ${data.mensagem || JSON.stringify(data)}`);
-    } catch (error) {
-        console.error("Erro ao enviar:", error);
-        alert("Falha ao conectar ao servidor.");
-    }
-}
