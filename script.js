@@ -1,46 +1,50 @@
-let serverData = {};
+const loginBtn = document.getElementById("loginBtn");
+const registerBtn = document.getElementById("registerBtn");
+const form = document.getElementById("form");
+const inputsDiv = document.getElementById("inputs");
+const statusMsg = document.getElementById("status");
 
-async function carregarStatusServidor() {
-    try {
-        const response = await fetch("server_status.json");
-        serverData = await response.json();
+let currentMode = null;
 
-        document.getElementById("server-url").textContent = serverData.url;
-        document.getElementById("server-port").textContent = serverData.porta;
-        document.getElementById("server-status").textContent = serverData.status;
-        document.getElementById("server-version").textContent = serverData.version;
+loginBtn.addEventListener("click", () => {
+    currentMode = "login";
+    form.classList.remove("hidden");
+    inputsDiv.innerHTML = `
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="password" id="senha" placeholder="Senha" required>
+    `;
+});
 
-    } catch (error) {
-        document.getElementById("server-status").textContent = "Erro ao carregar status!";
-        console.error("Erro ao ler JSON:", error);
-    }
-}
+registerBtn.addEventListener("click", () => {
+    currentMode = "register";
+    form.classList.remove("hidden");
+    inputsDiv.innerHTML = `
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="password" id="senha" placeholder="Senha" required>
+        <input type="text" id="nome" placeholder="Nome de usuário" required>
+    `;
+});
 
-async function enviarComando(endpoint) {
+form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    statusMsg.textContent = "⏳ Enviando...";
+
     const email = document.getElementById("email").value;
     const senha = document.getElementById("senha").value;
+    const nome = document.getElementById("nome")?.value;
 
-    if (!serverData.url) {
-        alert("Servidor não encontrado. Aguarde carregar o status.");
-        return;
-    }
+    let endpoint = currentMode === "login" ? "/login" : "/register";
 
     try {
-        const res = await fetch(`${serverData.url}/${endpoint}`, {
+        const resposta = await fetch(endpoint, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, senha })
+            body: JSON.stringify({ email, senha, nome }),
         });
 
-        const data = await res.json();
-        document.getElementById("response").textContent = data.mensagem || "Resposta recebida.";
-    } catch (error) {
-        document.getElementById("response").textContent = "Erro ao conectar ao servidor.";
-        console.error(error);
+        const data = await resposta.json();
+        statusMsg.textContent = data.mensagem || JSON.stringify(data);
+    } catch (err) {
+        statusMsg.textContent = "❌ Erro ao conectar ao servidor.";
     }
-}
-
-document.getElementById("btn-register").addEventListener("click", () => enviarComando("register"));
-document.getElementById("btn-login").addEventListener("click", () => enviarComando("login"));
-
-carregarStatusServidor();
+});

@@ -3,29 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Servidor - Launcher Game</title>
+    <title>Retorne a Obearco</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <main>
-        <h1>🌍 Status do Servidor</h1>
-        <div id="status-container">
-            <p><strong>URL:</strong> <span id="server-url">Carregando...</span></p>
-            <p><strong>Porta:</strong> <span id="server-port">...</span></p>
-            <p><strong>Status:</strong> <span id="server-status">...</span></p>
-            <p><strong>Versão:</strong> <span id="server-version">...</span></p>
+    <div class="container">
+        <h1 class="logo">⚙️ Retorne a Obearco</h1>
+        
+        <div class="menu">
+            <button id="loginBtn">Login</button>
+            <button id="registerBtn">Registro</button>
         </div>
 
-        <h2>🔐 Testar Conexão</h2>
-        <div id="form-container">
-            <input type="text" id="email" placeholder="Email">
-            <input type="password" id="senha" placeholder="Senha">
-            <button id="btn-register">Registrar</button>
-            <button id="btn-login">Login</button>
-        </div>
+        <form id="form" class="hidden">
+            <div id="inputs"></div>
+            <button type="submit" class="submit">Concluir</button>
+        </form>
 
-        <p id="response"></p>
-    </main>
+        <p id="status"></p>
+    </div>
 
     <script src="scripts.js"></script>
 </body>
