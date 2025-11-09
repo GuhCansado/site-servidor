@@ -4,7 +4,8 @@ window.addEventListener("load", async () => {
     const versionBox = document.getElementById("version");
     const sendButton = document.getElementById("sendButton");
     const jsonInput = document.getElementById("jsonInput");
-    const responseBox = document.getElementById("responseBox");
+    // Adicionei responseBox aqui, caso seu HTML o use para exibir a resposta.
+    const responseBox = document.getElementById("responseBox"); 
 
     if (!statusIndicator || !statusText || !sendButton) {
         console.error("❌ Elementos não encontrados no DOM. Verifique os IDs no HTML.");
@@ -16,8 +17,10 @@ window.addEventListener("load", async () => {
     // 📦 Função para carregar as informações do servidor
     async function loadServerInfo() {
         try {
-            const res = await fetch("server_info.json?cache=" + Date.now());
-            if (!res.ok) throw new Error("Arquivo server_info.json não encontrado.");
+            // 🛑 ALTERAÇÃO AQUI: Buscando 'server_status.json'
+            const res = await fetch("server_status.json?cache=" + Date.now()); 
+            
+            if (!res.ok) throw new Error("Arquivo server_status.json não encontrado.");
             serverData = await res.json();
 
             versionBox.textContent = `Versão: ${serverData.version || "Desconhecida"}`;
@@ -33,13 +36,14 @@ window.addEventListener("load", async () => {
             console.error("Erro ao carregar informações do servidor:", err);
             statusIndicator.classList.remove("online");
             statusText.textContent = "🔴 Erro ao carregar status";
+            if (responseBox) responseBox.textContent = "⚠️ Verifique se 'server_status.json' foi enviado para o GitHub Pages.";
         }
     }
 
     // 🚀 Envia o JSON digitado para o servidor
     async function sendJson() {
         if (!serverData || !serverData.url) {
-            responseBox.textContent = "⚠️ Servidor não configurado ou offline.";
+            if (responseBox) responseBox.textContent = "⚠️ Servidor não configurado ou offline. (URL não encontrada no JSON)";
             return;
         }
 
@@ -47,25 +51,29 @@ window.addEventListener("load", async () => {
         try {
             userJson = JSON.parse(jsonInput.value);
         } catch {
-            responseBox.textContent = "❌ JSON inválido. Corrija o formato antes de enviar.";
+            if (responseBox) responseBox.textContent = "❌ JSON inválido. Corrija o formato antes de enviar.";
             return;
         }
 
-        responseBox.textContent = "⏳ Enviando dados...";
+        if (responseBox) responseBox.textContent = "⏳ Enviando dados...";
+        
+        // Determina a URL de destino (Você pode querer adicionar o endpoint aqui, se necessário)
+        // Por exemplo, se for para login: const targetUrl = serverData.url + "/login";
+        const targetUrl = serverData.url; 
 
         try {
-            const res = await fetch(serverData.url, {
+            const res = await fetch(targetUrl, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(userJson)
             });
 
             const text = await res.text();
-            responseBox.textContent = "✅ Resposta do servidor:\n" + text;
+            if (responseBox) responseBox.textContent = "✅ Resposta do servidor:\n" + text;
             jsonInput.value = "";
         } catch (err) {
             console.error("Erro ao enviar JSON:", err);
-            responseBox.textContent = "🔴 Erro ao conectar ao servidor.";
+            if (responseBox) responseBox.textContent = "🔴 Erro ao conectar ao servidor. (Verifique o CORS no Flask)";
         }
     }
 
