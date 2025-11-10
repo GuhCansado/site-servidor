@@ -4,9 +4,9 @@ window.addEventListener("load", async () => {
     const versionBox = document.getElementById("version");
     const sendButton = document.getElementById("sendButton");
     const jsonInput = document.getElementById("jsonInput");
-    const responseBox = document.getElementById("responseBox");
+    const responseBox = document.getElementById("responseBox"); 
 
-    if (!statusIndicator || !statusText || !versionBox || !sendButton || !jsonInput || !responseBox) {
+    if (!statusIndicator || !statusText || !sendButton || !responseBox) {
         console.error("❌ Elementos não encontrados no DOM. Verifique os IDs no HTML.");
         return;
     }
@@ -31,7 +31,6 @@ window.addEventListener("load", async () => {
                 statusIndicator.classList.remove("online");
                 statusText.textContent = "🔴 Servidor Offline";
             }
-            responseBox.textContent = "";
         } catch (err) {
             console.error("Erro ao carregar informações do servidor:", err);
             statusIndicator.classList.remove("online");
@@ -55,19 +54,22 @@ window.addEventListener("load", async () => {
             return;
         }
 
-        const endpoint = (userJson.comando || "").toString().trim();
+        // 🛑 CORREÇÃO 405: Determina o endpoint a partir do JSON
+        let endpoint = userJson.comando; 
 
-        if (!(endpoint === "/register" || endpoint === "/login")) {
-            responseBox.textContent = '❌ JSON inválido: use o campo "comando" com "/register" ou "/login".';
+        // Validação, mas o Flask usa o endpoint na URL
+        if (!endpoint) {
+             // Se o JSON não tem 'comando', tentamos /register por padrão
+             endpoint = '/register'; 
+        } else if (endpoint !== '/register' && endpoint !== '/login') {
+            responseBox.textContent = '❌ JSON Inválido: Use **"comando": "/register"** ou **"comando": "/login"** no seu JSON.';
             return;
         }
 
-        responseBox.textContent = "⏳ Enviando dados para " + endpoint + "...";
-        sendButton.disabled = true;
-
-        // monta a URL garantindo que não haja // duplicado
-        const baseUrl = serverData.url.replace(/\/+$/, "");
-        const targetUrl = baseUrl + endpoint;
+        responseBox.textContent = `⏳ Enviando dados para ${endpoint}...`;
+        
+        // Concatena a URL base do ngrok com o endpoint
+        const targetUrl = serverData.url + endpoint; 
 
         try {
             const res = await fetch(targetUrl, {
@@ -76,19 +78,12 @@ window.addEventListener("load", async () => {
                 body: JSON.stringify(userJson)
             });
 
-            if (res.status === 405) {
-                responseBox.textContent = "🔴 Erro 405 (Method Not Allowed). Verifique se o endpoint existe: " + targetUrl;
-                return;
-            }
-
             const text = await res.text();
-            responseBox.textContent = "✅ Resposta do servidor:\n" + text;
+            responseBox.textContent = `✅ Resposta do servidor (${res.status}):\n${text}`;
             jsonInput.value = "";
         } catch (err) {
             console.error("Erro ao enviar JSON:", err);
-            responseBox.textContent = "🔴 Erro ao conectar ao servidor. Verifique o CORS e se o ngrok está ativo.";
-        } finally {
-            sendButton.disabled = false;
+            responseBox.textContent = "🔴 Erro ao conectar ao servidor. (Verifique o CORS ou se o ngrok está ativo).";
         }
     }
 
