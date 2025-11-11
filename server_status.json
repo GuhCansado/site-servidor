@@ -1,7 +1,7 @@
 {
     "url_api_base": "https://darell-unstethoscoped-nonperversely.ngrok-free.dev",
     "porta": 5000,
-    "status_servidor": "Online",
+    "status_servidor": "Offline",
     "version_api": "0.0.0.1",
     "LAUCHER": {
         "current_version": "1.0.1",
