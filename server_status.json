@@ -1,7 +1,7 @@
 {
-    "url_api_base": "https://darell-unstethoscoped-nonperversely.ngrok-free.dev",
+    "url_api_base": "OBEARCO",
     "porta": 5000,
-    "status_servidor": "Offline",
+    "status_servidor": "Online",
     "version_api": "0.0.0.1",
     "LAUCHER": {
         "current_version": "0.0.2",
